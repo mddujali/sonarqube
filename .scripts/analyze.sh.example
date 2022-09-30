@@ -1,0 +1,15 @@
+#!/bin/bash
+
+SRC=
+IP_ADDRESS=$(ip addr show | grep "\binet\b.*\bdocker0\b" | awk '{print $2}' | cut -d '/' -f 1)
+PORT=
+PROJECT_KEY=
+TOKEN=
+
+docker run \
+    --rm \
+    -v "$SRC:/usr/src" \
+    sonarsource/sonar-scanner-cli \
+    -Dsonar.projectKey=$PROJECT_KEY \
+    -Dsonar.host.url="http://$IP_ADDRESS:$PORT" \
+    -Dsonar.login=$TOKEN

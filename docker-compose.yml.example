@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  sonarqube:
+    image: sonarqube
+    build:
+      context: .
+      dockerfile: docker/sonarqube.dockerfile
+    container_name: sonarqube
+    expose:
+      - 9000
+    ports:
+      - "9876:9000"
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+      - sonarqube_logs:/opt/sonarqube/logs
+
+  sonar-scanner-cli:
+    image: sonarsource/sonar-scanner-cli
+    build:
+      context: .
+      dockerfile: docker/sonar-scanner-cli.dockerfile
+    container_name: sonar-scanner-cli
+    depends_on:
+        - sonarqube
+
+  postgres:
+    image: postgres
+    build:
+      context: .
+      dockerfile: docker/postgres.dockerfile
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_bundled-plugins:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
